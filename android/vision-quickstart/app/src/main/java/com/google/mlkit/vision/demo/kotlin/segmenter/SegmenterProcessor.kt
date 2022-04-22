@@ -17,6 +17,8 @@
 package com.google.mlkit.vision.demo.kotlin.segmenter
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
@@ -32,7 +34,7 @@ import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
 class SegmenterProcessor :
   VisionProcessorBase<SegmentationMask> {
   private val segmenter: Segmenter
-
+  private val bgBitmap: Bitmap
   constructor(context: Context) : this(context, /* isStreamMode= */ true)
 
   constructor(
@@ -53,6 +55,10 @@ class SegmenterProcessor :
     val options = optionsBuilder.build()
     segmenter = Segmentation.getClient(options)
     Log.d(TAG, "SegmenterProcessor created with option: " + options)
+    val inputStream = context.assets.open("bg4.jpg")
+
+
+    bgBitmap = BitmapFactory.decodeStream(inputStream)
   }
 
   override fun detectInImage(image: InputImage): Task<SegmentationMask> {
@@ -66,7 +72,8 @@ class SegmenterProcessor :
     graphicOverlay.add(
       SegmentationGraphic(
         graphicOverlay,
-        segmentationMask
+        segmentationMask,
+        bgBitmap,
       )
     )
   }

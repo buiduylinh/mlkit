@@ -16,17 +16,19 @@
 
 package com.google.mlkit.vision.demo.kotlin.segmenter
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Matrix
+import android.graphics.*
 import androidx.annotation.ColorInt
 import com.google.mlkit.vision.demo.GraphicOverlay
 import com.google.mlkit.vision.segmentation.SegmentationMask
 import java.nio.ByteBuffer
 
+
 /** Draw the mask from SegmentationResult in preview.  */
-class SegmentationGraphic(overlay: GraphicOverlay, segmentationMask: SegmentationMask) :
+class SegmentationGraphic(
+  overlay: GraphicOverlay,
+  segmentationMask: SegmentationMask,
+  val bgBitmap: Bitmap,
+) :
   GraphicOverlay.Graphic(overlay) {
   private val mask: ByteBuffer
   private val maskWidth: Int
@@ -41,9 +43,17 @@ class SegmentationGraphic(overlay: GraphicOverlay, segmentationMask: Segmentatio
       maskColorsFromByteBuffer(mask), maskWidth, maskHeight, Bitmap.Config.ARGB_8888
     )
     if (isRawSizeMaskEnabled) {
+      val paint = Paint()
+
+      canvas.drawBitmap(bgBitmap, 0f, 0f, paint)
+
+
+      val mode: PorterDuff.Mode = PorterDuff.Mode.DST_IN
+      paint.xfermode = PorterDuffXfermode(mode)
+
       val matrix = Matrix(getTransformationMatrix())
       matrix.preScale(scaleX, scaleY)
-      canvas.drawBitmap(bitmap, matrix, null)
+      canvas.drawBitmap(bitmap, matrix, paint)
     } else {
       canvas.drawBitmap(bitmap, getTransformationMatrix(), null)
     }
@@ -60,7 +70,7 @@ class SegmentationGraphic(overlay: GraphicOverlay, segmentationMask: Segmentatio
     for (i in 0 until maskWidth * maskHeight) {
       val backgroundLikelihood = 1 - byteBuffer.float
       if (backgroundLikelihood > 0.9) {
-        colors[i] = Color.argb(128, 255, 0, 255)
+        colors[i] = Color.argb(255, 255, 0, 255)
       } else if (backgroundLikelihood > 0.2) {
         // Linear interpolation to make sure when backgroundLikelihood is 0.2, the alpha is 0 and
         // when backgroundLikelihood is 0.9, the alpha is 128.

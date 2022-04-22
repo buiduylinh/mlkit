@@ -18,6 +18,10 @@ package com.google.mlkit.vision.demo;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+
 import com.google.mlkit.vision.demo.GraphicOverlay.Graphic;
 
 /** Draw camera image to background. */
@@ -32,6 +36,8 @@ public class CameraImageGraphic extends Graphic {
 
   @Override
   public void draw(Canvas canvas) {
-    canvas.drawBitmap(bitmap, getTransformationMatrix(), null);
+    Paint paint = new Paint();
+    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_ATOP));
+    canvas.drawBitmap(bitmap, getTransformationMatrix(), paint);
   }
 }

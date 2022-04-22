@@ -338,10 +338,13 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
             Log.d(TAG, "Memory available in system: $availableMegs MB")
           }
           graphicOverlay.clear()
+
+          this@VisionProcessorBase.onSuccess(results, graphicOverlay)
+
           if (originalCameraImage != null) {
             graphicOverlay.add(CameraImageGraphic(graphicOverlay, originalCameraImage))
           }
-          this@VisionProcessorBase.onSuccess(results, graphicOverlay)
+
           if (!PreferenceUtils.shouldHideDetectionInfo(graphicOverlay.context)) {
             graphicOverlay.add(
               InferenceInfoGraphic(
